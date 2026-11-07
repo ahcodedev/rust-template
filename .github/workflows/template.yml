@@ -1,0 +1,42 @@
+name: Template
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Cancel in-progress runs for the same branch/PR when new commits are pushed
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # Installs the toolchain and components pinned in the template's rust-toolchain.toml
+      - name: Install Rust
+        working-directory: template
+        run: rustup toolchain install
+
+      - name: Install just
+        uses: taiki-e/install-action@v2
+        with:
+          tool: just
+
+      - name: Install Copier
+        run: pipx install copier
+
+      - name: Generate and test project
+        run: just test-template

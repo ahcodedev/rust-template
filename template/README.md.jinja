@@ -1,0 +1,42 @@
+# {{ project_name }}
+
+{{ description }}
+
+## Setup
+
+### macOS
+
+- Install `just` - `brew install just`
+- Install Homebrew dependencies and the Rust toolchain pinned in `rust-toolchain.toml` - `just setup`
+- Verify the setup - `just test`
+
+Homebrew's `rustup` is keg-only, so `cargo` and `rustc` aren't on your shell PATH. The `justfile` adds them for every recipe, so use `just` commands rather than calling `cargo` directly. To use `cargo` in your shell, add this to `~/.zshrc`:
+
+```sh
+export PATH="$(brew --prefix rustup)/bin:$PATH"
+```
+
+### Dev Container
+
+- Open the repo in VS Code and run **Dev Containers: Reopen in Container**
+  - Rust, `just`, and the recommended extensions are installed automatically
+
+## Project Commands
+
+Commands are defined in the `justfile` and run with [just](https://github.com/casey/just).
+
+- List available commands - `just`
+- Install Homebrew dependencies and the pinned toolchain - `just setup`
+- Build the project - `just build`
+  - Pass extra flags - `just build --release`
+- Run tests - `just test`
+  - Pass extra args - `just test greeting`
+- Format all code - `just fmt`
+- Check formatting and run clippy with warnings as errors - `just lint`
+
+## Template
+
+This project was generated from a [Copier](https://copier.readthedocs.io/) template.
+
+- Pull in template updates - `copier update`
+- Don't edit `.copier-answers.yml` by hand; Copier uses it to apply updates
