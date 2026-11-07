@@ -7,7 +7,8 @@
 ### macOS
 
 - Install `just` - `brew install just`
-- Install Homebrew dependencies and the Rust toolchain pinned in `rust-toolchain.toml` - `just setup`
+- Install Homebrew dependencies, the Rust toolchain pinned in `rust-toolchain.toml` and the Git hooks - `just setup`
+  - Run `git init` first; the hooks are only installed in a Git repository
 - Verify the setup - `just test`
 
 Homebrew's `rustup` is keg-only, so `cargo` and `rustc` aren't on your shell PATH. The `justfile` adds them for every recipe, so use `just` commands rather than calling `cargo` directly. To use `cargo` in your shell, add this to `~/.zshrc`:
@@ -19,20 +20,41 @@ export PATH="$(brew --prefix rustup)/bin:$PATH"
 ### Dev Container
 
 - Open the repo in VS Code and run **Dev Containers: Reopen in Container**
-  - Rust, `just`, and the recommended extensions are installed automatically
+  - Rust, `just`, actionlint, zizmor, prek, gitleaks and the recommended extensions are installed automatically
+  - The Git hooks are installed if the workspace is a Git repository
 
 ## Project Commands
 
 Commands are defined in the `justfile` and run with [just](https://github.com/casey/just).
 
 - List available commands - `just`
-- Install Homebrew dependencies and the pinned toolchain - `just setup`
+- Install Homebrew dependencies, the pinned toolchain and the Git hooks - `just setup`
 - Build the project - `just build`
   - Pass extra flags - `just build --release`
 - Run tests - `just test`
   - Pass extra args - `just test greeting`
 - Format all code - `just fmt`
-- Check formatting and run clippy with warnings as errors - `just lint`
+- Check formatting, run clippy with warnings as errors, and check GitHub Actions workflows with actionlint and zizmor - `just lint`
+- Scan the Git history for committed secrets - `just gitleaks`
+
+## Checks
+
+- Git hooks, managed by [prek](https://github.com/j178/prek) (`prek.toml`), run before each commit
+  - `just lint`
+  - [gitleaks](https://github.com/gitleaks/gitleaks) on the staged changes
+  - Install them manually with `prek install`
+- CI runs `just lint` and `just test`, and scans the Git history for secrets with gitleaks
+  - Repos owned by a GitHub organization need a `GITLEAKS_LICENSE` secret for the gitleaks job; personal repos don't
+  - Dependabot PRs only get Dependabot secrets, so organization repos also need `GITLEAKS_LICENSE` added as a Dependabot secret
+
+## Dependency Updates
+
+- Dependabot (`.github/dependabot.yml`) opens weekly PRs for Cargo dependencies and GitHub Actions
+  - Updates wait 7 days after a release before a PR is opened
+- Patch and minor updates are auto-merged once CI passes (`.github/workflows/dependabot-auto-merge.yml`); major updates wait for review
+  - Auto-merge needs "Allow auto-merge" turned on in the repository settings and a branch protection rule or ruleset on `main` that requires the CI checks
+  - On GitHub Free, branch protection and auto-merge are only available for public repos
+- Dependabot doesn't update the actionlint version in the workflows and dev container, or the gitleaks version and image in the dev container
 
 ## Template
 

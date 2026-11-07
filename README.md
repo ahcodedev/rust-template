@@ -7,7 +7,33 @@ Rust project template for [Copier](https://copier.readthedocs.io/).
 - Create a new project - `copier copy gh:<owner>/rust-template path/to/new-project`
 - Pull in template updates from inside a generated project - `copier update`
 
+## Development
+
+- Install Copier, `just`, actionlint, zizmor, prek and gitleaks - `brew bundle`
+- Enable the Git hooks in `prek.toml` - `prek install`
+  - Before each commit they run `just lint` and scan the staged changes for secrets with gitleaks
+
+Commands are defined in the `justfile` and run with [just](https://github.com/casey/just).
+
+- List available commands - `just`
+- Check GitHub Actions workflows with actionlint and zizmor - `just lint`
+- Render the template into a temp directory, then lint and test the generated project - `just test-template`
+- Scan the Git history for committed secrets - `just gitleaks`
+
+CI runs `just lint` and `just test-template`, and scans the Git history for secrets with gitleaks.
+
+## Dependency Updates
+
+- Dependabot (`.github/dependabot.yml`) opens weekly PRs for GitHub Actions in this repo's workflows and in `template/`
+  - Updates wait 7 days after a release before a PR is opened
+- Patch and minor updates are auto-merged once CI passes (`.github/workflows/dependabot-auto-merge.yml`); major updates wait for review
+  - Auto-merge needs "Allow auto-merge" turned on in the repository settings and a branch protection rule or ruleset on `main` that requires the CI checks
+  - On GitHub Free, branch protection and auto-merge are only available for public repos
+- Dependabot doesn't update the actionlint version in the workflows and dev container, the gitleaks version and image in the dev container, or anything in `.jinja` files
+
 ## Layout
 
 - `copier.yml` - template questions and settings
 - `template/` - files rendered into new projects; files ending in `.jinja` are templated
+- `prek.toml` - Git hooks for this repo
+- `.github/pull_request_template.md` - checklist filled into new PR descriptions

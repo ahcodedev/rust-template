@@ -10,6 +10,16 @@ brew "just"
 # Project template tool; run `copier update` to pull in template changes
 brew "copier"
 
+# GitHub Actions linters (run by `just lint`)
+brew "actionlint"
+brew "zizmor"
+
+# Git hook manager (see prek.toml); `just setup` installs the hooks
+brew "prek"
+
+# Secret scanner (prek hook and `just gitleaks`)
+brew "gitleaks"
+
 # Dev tools
 # brew "bacon"          # background checker: re-runs clippy/tests on save
 # brew "cargo-nextest"  # faster test runner

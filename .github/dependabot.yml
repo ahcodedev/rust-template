@@ -1,0 +1,17 @@
+# Dependabot version updates; patch and minor updates are auto-merged by dependabot-auto-merge.yml
+version: 2
+updates:
+  # Actions in this repo's workflows and in the workflows rendered into new projects
+  - package-ecosystem: github-actions
+    directories:
+      - /
+      - /template
+    schedule:
+      interval: weekly
+    # Wait a week after a release, so broken or malicious versions are more likely to be caught first
+    cooldown:
+      default-days: 7
+    groups:
+      github-actions:
+        patterns:
+          - "*"

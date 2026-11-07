@@ -8,12 +8,13 @@ default:
 rustup_prefix := `brew --prefix rustup 2>/dev/null || true`
 export PATH := if rustup_prefix != "" { rustup_prefix / "bin" + ":" + env("PATH") } else { env("PATH") }
 
-# Install Homebrew dependencies and the pinned toolchain
+# Install Homebrew dependencies, the pinned toolchain and the prek Git hooks
 setup:
     brew bundle install
     rustup toolchain install
     rustc --version
     cargo --version
+    prek install
 
 # Build the project (pass extra flags, e.g. `just build --release`)
 build *args:
@@ -27,7 +28,13 @@ test *args:
 fmt:
     cargo fmt --all
 
-# Check formatting and run clippy with warnings as errors
+# Check formatting, run clippy with warnings as errors, and check GitHub Actions workflows
 lint:
     cargo fmt --all --check
     cargo clippy --all-targets --all-features -- -D warnings
+    actionlint .github/workflows/*.yml
+    zizmor .
+
+# Scan the Git history for committed secrets (pass extra flags, e.g. `just gitleaks --log-opts=-5`)
+gitleaks *args:
+    gitleaks git --redact {{args}}

@@ -3,6 +3,11 @@
 default:
     @just --list
 
+# Check GitHub Actions workflows with actionlint and audit them for security issues with zizmor
+lint:
+    actionlint .github/workflows/*.yml
+    zizmor .
+
 # Render the template into a temp directory, then lint and test the generated project
 test-template:
     #!/usr/bin/env bash
@@ -18,3 +23,7 @@ test-template:
     cd "$tmp/test-project"
     just lint
     just test
+
+# Scan the Git history for committed secrets (pass extra flags, e.g. `just gitleaks --log-opts=-5`)
+gitleaks *args:
+    gitleaks git --redact {{args}}
