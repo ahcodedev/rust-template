@@ -1,5 +1,8 @@
-//! Binary entry point: a thin wrapper that calls into the library.
+//! Binary entry point.
+//!
+//! Kept as a thin wrapper that calls into the library, so the logic stays testable.
 
+/// Prints the greeting from the library.
 fn main() {
     println!("{}", {{ crate_name }}::greeting());
 }

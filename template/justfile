@@ -10,14 +10,15 @@ rustup_prefix := `brew --prefix rustup 2>/dev/null || true`
 cargo_bin := env("CARGO_HOME", home_directory() / ".cargo") / "bin"
 export PATH := cargo_bin + ":" + if rustup_prefix != "" { rustup_prefix / "bin" + ":" + env("PATH") } else { env("PATH") }
 
-# Rust tools installed by `just install-tools` as prebuilt binaries with cargo-binstall; bump versions here
+# Rust tools installed by `just install-tools` as prebuilt binaries with
+# cargo-binstall; bump versions here
 binstall_version := "1.26.2"
 cargo_tools := "cargo-deny@0.20.2 cargo-nextest@0.9.151 cargo-shear@1.14.0 cargo-llvm-cov@0.9.1 typos-cli@1.52.0"
 
-# Minimum line coverage (%) for `just coverage`; override once with `just coverage_threshold=90 coverage`
+# Minimum coverage (%) for `just coverage`
 coverage_threshold := "98"
 
-# Install Homebrew dependencies, the pinned toolchain, the Rust tools and the prek Git hooks
+# Install Homebrew dependencies, pinned toolchain, Rust tools and prek Git hooks
 setup:
     brew bundle install
     rustup toolchain install
@@ -26,12 +27,12 @@ setup:
     just install-tools
     prek install
 
-# Install the pinned Rust tools (`cargo_tools`), installing cargo-binstall from source first if it's missing
+# Install the pinned Rust tools (`cargo_tools`)
 install-tools:
     command -v cargo-binstall >/dev/null || cargo install --locked cargo-binstall@{{binstall_version}}
     cargo binstall --no-confirm {{cargo_tools}}
 
-# Bump `binstall_version` and the `cargo_tools` versions in this justfile to their latest releases, then install them
+# Bump `binstall_version` and the `cargo_tools` versions
 update-cargo-tools:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -62,12 +63,12 @@ update-template *args:
 build *args:
     cargo build {{args}}
 
-# Run tests with nextest, then doc tests, which nextest doesn't run (pass extra args, e.g. `just test greeting`)
+# Run tests and doc tests (pass extra args, e.g. `just test greeting`)
 test *args:
     cargo nextest run {{args}}
     cargo test --doc
 
-# Run tests with coverage and fail below `coverage_threshold`% line coverage (src/main.rs is excluded; doc tests aren't counted)
+# Run tests with coverage and fail below `coverage_threshold`% line coverage
 coverage *args:
     cargo llvm-cov nextest --fail-under-lines {{coverage_threshold}} --ignore-filename-regex 'src/main\.rs$' {{args}}
 
@@ -76,7 +77,7 @@ fmt:
     cargo fmt --all
     tombi format
 
-# Check spelling and Rust and TOML formatting, run clippy and rustdoc with warnings as errors, check for unused dependencies, and check GitHub Actions workflows
+# Check spelling, Rust and TOML formatting, clippy, rustdoc, unused dependencies, and GitHub Actions
 lint:
     typos
     cargo fmt --all --check
@@ -87,7 +88,7 @@ lint:
     actionlint .github/workflows/*.yml
     zizmor .
 
-# Check the project builds with its minimum supported Rust version (`rust-version` in Cargo.toml)
+# Check the project builds with its minimum supported Rust version
 msrv:
     #!/usr/bin/env bash
     set -euo pipefail
