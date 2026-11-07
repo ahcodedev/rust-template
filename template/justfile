@@ -32,7 +32,7 @@ install-tools:
     cargo binstall --no-confirm {{cargo_tools}}
 
 # Bump `binstall_version` and the `cargo_tools` versions in this justfile to their latest releases, then install them
-update:
+update-cargo-tools:
     #!/usr/bin/env bash
     set -euo pipefail
     latest() {
@@ -53,6 +53,10 @@ update:
     echo "binstall_version := \"$binstall\""
     echo "cargo_tools := \"$tools\""
     just install-tools
+
+# Pull in template updates with Copier; needs a clean Git working tree (pass extra flags, e.g. `just update-template --skip-answered`)
+update-template *args:
+    copier update {{args}}
 
 # Build the project (pass extra flags, e.g. `just build --release`)
 build *args:
