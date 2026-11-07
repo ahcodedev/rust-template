@@ -1,31 +1,13 @@
 # rust-template
 
-Rust Project Template
+Rust project template for [Copier](https://copier.readthedocs.io/).
 
-## Setup
+## Usage
 
-### macOS
+- Create a new project - `copier copy gh:<owner>/rust-template path/to/new-project`
+- Pull in template updates from inside a generated project - `copier update`
 
-- Install Homebrew dependencies - `brew bundle`
-  - May require updating path - `export PATH="$(brew --prefix rustup)/bin:$HOME/.cargo/bin:$PATH"`
-    - Add it to `~/.zshrc` to make it permanent
-- Install the Rust toolchain pinned in `rust-toolchain.toml` - `rustup toolchain install`
-- Verify the setup - `just test`
+## Layout
 
-### Dev Container
-
-- Open the repo in VS Code and run **Dev Containers: Reopen in Container**
-  - Rust, `just`, and the recommended extensions are installed automatically
-
-## Project Commands
-
-Commands are defined in the `justfile` and run with [just](https://github.com/casey/just).
-
-- List available commands - `just` or `just help`
-- Add rustup to PATH if missing and install the pinned toolchain - `just setup`
-- Build the project - `just build`
-  - Pass extra flags - `just build --release`
-- Run tests - `just test`
-  - Pass extra args - `just test greeting`
-- Format all code - `just fmt`
-- Check formatting and run clippy with warnings as errors - `just lint`
+- `copier.yml` - template questions and settings
+- `template/` - files rendered into new projects; files ending in `.jinja` are templated

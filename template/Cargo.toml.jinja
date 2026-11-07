@@ -1,8 +1,11 @@
 [package]
-name = "rust-template"
+name = "{{ project_name }}"
 version = "0.1.0"
 edition = "2024"
 rust-version = "1.85"
+{%- if description %}
+description = "{{ description }}"
+{%- endif %}
 license = "MIT"
 
 [dependencies]

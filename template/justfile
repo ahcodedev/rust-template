@@ -1,0 +1,33 @@
+# List available recipes
+[private]
+default:
+    @just --list
+
+# Homebrew's rustup is keg-only, so neither rustup nor its cargo/rustc proxies
+# are on PATH. Prepend its bin directory for all recipes when Homebrew is available.
+rustup_prefix := `brew --prefix rustup 2>/dev/null || true`
+export PATH := if rustup_prefix != "" { rustup_prefix / "bin" + ":" + env("PATH") } else { env("PATH") }
+
+# Install Homebrew dependencies and the pinned toolchain
+setup:
+    brew bundle install
+    rustup toolchain install
+    rustc --version
+    cargo --version
+
+# Build the project (pass extra flags, e.g. `just build --release`)
+build *args:
+    cargo build {{args}}
+
+# Run tests (pass extra args, e.g. `just test greeting`)
+test *args:
+    cargo test {{args}}
+
+# Format all code
+fmt:
+    cargo fmt --all
+
+# Check formatting and run clippy with warnings as errors
+lint:
+    cargo fmt --all --check
+    cargo clippy --all-targets --all-features -- -D warnings
