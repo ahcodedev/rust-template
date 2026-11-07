@@ -8,14 +8,14 @@ Rust project template for [Copier](https://copier.readthedocs.io/).
 ## Usage
 
 - Create a new project - `copier copy gh:<owner>/rust-template path/to/new-project`
-- Pull in template updates from inside a generated project - `copier update`
+- Pull in template updates from inside a generated project - `just update-template` (runs `copier update`)
 
 ## Development
 
 - Install `just` - `brew install just`
 - Install Copier, rustup, tombi, actionlint, zizmor, prek and gitleaks with Homebrew, then cargo-binstall and the pinned Rust tools (cargo-deny, cargo-nextest, cargo-shear, cargo-llvm-cov, typos) with cargo - `just setup`
   - Change tool versions in `cargo_tools` at the top of the `justfile`; reinstall with `just install-tools`
-  - Bump them all to the latest releases and install them - `just update`
+  - Bump them all to the latest releases and install them - `just update-cargo-tools`
 - Enable the Git hooks in `prek.toml` - `prek install`
   - Before each commit they run `just lint` and scan the staged changes for secrets with gitleaks
 

@@ -8,7 +8,7 @@ Run project tasks through `just` (see `justfile`) rather than calling `cargo` di
 
 - `just setup` - install Homebrew dependencies, the pinned toolchain, the Rust tools (via `just install-tools`) and the prek Git hooks (`prek.toml`), which run `just lint` before each commit
 - `just install-tools` - install the Rust tools pinned in `cargo_tools` at the top of the `justfile` with cargo-binstall; bump versions there
-- `just update` - bump `binstall_version` and `cargo_tools` in the `justfile` to the latest releases, then install them
+- `just update-cargo-tools` - bump `binstall_version` and `cargo_tools` in the `justfile` to the latest releases, then install them
 - `just build` - build (pass extra flags, e.g. `just build --release`)
 - `just test` - run tests with cargo-nextest, then doc tests with `cargo test --doc` (pass a filter, e.g. `just test greeting`)
 - `just coverage` - run tests with coverage; fails below `coverage_threshold`% line coverage (set at the top of the `justfile`; `src/main.rs` excluded)
@@ -47,4 +47,4 @@ prek (`prek.toml`) runs `just lint` and a gitleaks scan of the staged changes be
 
 ## Template
 
-This project was generated from a Copier template. `.copier-answers.yml` is managed by Copier; don't edit it by hand. Template updates are pulled in with `copier update`.
+This project was generated from a Copier template. `.copier-answers.yml` is managed by Copier; don't edit it by hand. Template updates are pulled in with `just update-template` (runs `copier update`; needs a clean Git working tree).

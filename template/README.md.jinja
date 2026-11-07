@@ -25,7 +25,7 @@ export PATH="$HOME/.cargo/bin:$(brew --prefix rustup)/bin:$PATH"
 ### Dev Container
 
 - Open the repo in VS Code and run **Dev Containers: Reopen in Container**
-  - Rust, `just`, cargo-deny, cargo-nextest, cargo-shear, cargo-llvm-cov, typos, tombi, actionlint, zizmor, prek, gitleaks and the recommended extensions are installed automatically
+  - Rust, `just`, cargo-deny, cargo-nextest, cargo-shear, cargo-llvm-cov, typos, tombi, actionlint, zizmor, prek, gitleaks, Copier and the recommended extensions are installed automatically
   - The Git hooks are installed if the workspace is a Git repository
 
 ## Project Commands
@@ -35,7 +35,7 @@ Commands are defined in the `justfile` and run with [just](https://github.com/ca
 - List available commands - `just`
 - Install Homebrew dependencies, the pinned toolchain, the Rust tools and the Git hooks - `just setup`
 - Install or update the pinned Rust tools (`cargo_tools` in the `justfile`) - `just install-tools`
-- Bump the pinned Rust tools to their latest releases in the `justfile`, then install them - `just update`
+- Bump the pinned Rust tools to their latest releases in the `justfile`, then install them - `just update-cargo-tools`
 - Build the project - `just build`
   - Pass extra flags - `just build --release`
 - Run tests with [nextest](https://nexte.st), then doc tests - `just test`
@@ -80,5 +80,7 @@ Optional: re-run the tests each time you save with [bacon](https://dystroy.org/b
 
 This project was generated from a [Copier](https://copier.readthedocs.io/) template.
 
-- Pull in template updates - `copier update`
+- Pull in template updates - `just update-template`
+  - Runs `copier update`; commit or stash your changes first, since Copier needs a clean Git working tree
+  - Pass extra flags, e.g. only ask new questions - `just update-template --skip-answered`
 - Don't edit `.copier-answers.yml` by hand; Copier uses it to apply updates

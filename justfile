@@ -25,7 +25,7 @@ install-tools:
     cargo binstall --no-confirm {{cargo_tools}}
 
 # Bump `binstall_version` and the `cargo_tools` versions in this justfile to their latest releases, then install them
-update:
+update-cargo-tools:
     #!/usr/bin/env bash
     set -euo pipefail
     latest() {
