@@ -1,7 +1,8 @@
-//! Integration tests for the greeting.
+//! Integration tests for the greeting, run against the library's public API.
 
 use {{ crate_name }}::greeting;
 
+/// The greeting is the classic "Hello, world!".
 #[test]
 fn greeting_says_hello() {
     assert_eq!(greeting(), "Hello, world!");

@@ -1,4 +1,7 @@
-//! Library crate: application logic lives here so it can be tested.
+//! Library crate for the project.
+//!
+//! Application logic lives here rather than in `main.rs`, so it can be covered by unit tests,
+//! the integration tests in `tests/`, and doc tests.
 
 /// Returns the greeting printed by the binary.
 #[must_use]
