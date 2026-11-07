@@ -30,6 +30,7 @@ description:
 github_owner:
   type: str
   help: GitHub user or organization that will host the repository (used for README badges)
+  default: ""
 
 github_repo:
   type: str
