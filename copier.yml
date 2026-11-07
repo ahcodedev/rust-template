@@ -1,5 +1,13 @@
-_min_copier_version: "9.0.0"
+_min_copier_version: "9.6.0"
 _subdirectory: template
+
+# Starter code is only created by `copier copy`. `copier update` skips these files, so a project
+# can change, move or delete them without an update recreating or overwriting them.
+# (`_copier_operation` needs Copier 9.6.0 or later.)
+_exclude:
+  - "{% if _copier_operation == 'update' %}src/lib.rs{% endif %}"
+  - "{% if _copier_operation == 'update' %}src/main.rs{% endif %}"
+  - "{% if _copier_operation == 'update' %}tests/greeting.rs{% endif %}"
 
 project_name:
   type: str
@@ -18,10 +26,6 @@ description:
   type: str
   help: Short description of the project
   default: ""
-
-author_name:
-  type: str
-  help: Name used in the LICENSE copyright line
 
 copyright_year:
   type: str

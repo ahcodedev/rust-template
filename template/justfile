@@ -4,36 +4,97 @@ default:
     @just --list
 
 # Homebrew's rustup is keg-only, so neither rustup nor its cargo/rustc proxies
-# are on PATH. Prepend its bin directory for all recipes when Homebrew is available.
+# are on PATH. Prepend its bin directory for all recipes when Homebrew is available,
+# plus Cargo's bin directory, where `just install-tools` puts the Rust tools.
 rustup_prefix := `brew --prefix rustup 2>/dev/null || true`
-export PATH := if rustup_prefix != "" { rustup_prefix / "bin" + ":" + env("PATH") } else { env("PATH") }
+cargo_bin := env("CARGO_HOME", home_directory() / ".cargo") / "bin"
+export PATH := cargo_bin + ":" + if rustup_prefix != "" { rustup_prefix / "bin" + ":" + env("PATH") } else { env("PATH") }
 
-# Install Homebrew dependencies, the pinned toolchain and the prek Git hooks
+# Rust tools installed by `just install-tools` as prebuilt binaries with cargo-binstall; bump versions here
+binstall_version := "1.26.2"
+cargo_tools := "cargo-deny@0.20.2 cargo-nextest@0.9.151 cargo-shear@1.14.0 cargo-llvm-cov@0.9.1 typos-cli@1.52.0"
+
+# Minimum line coverage (%) for `just coverage`; override once with `just coverage_threshold=90 coverage`
+coverage_threshold := "98"
+
+# Install Homebrew dependencies, the pinned toolchain, the Rust tools and the prek Git hooks
 setup:
     brew bundle install
     rustup toolchain install
     rustc --version
     cargo --version
+    just install-tools
     prek install
+
+# Install the pinned Rust tools (`cargo_tools`), installing cargo-binstall from source first if it's missing
+install-tools:
+    command -v cargo-binstall >/dev/null || cargo install --locked cargo-binstall@{{binstall_version}}
+    cargo binstall --no-confirm {{cargo_tools}}
+
+# Bump `binstall_version` and the `cargo_tools` versions in this justfile to their latest releases, then install them
+update:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    latest() {
+        local version
+        version="$(cargo info --registry crates-io "$1" 2>/dev/null | sed -n 's/^version: \([^ ]*\).*/\1/p' | head -1)"
+        [[ -n "$version" ]] || { echo "could not find the latest version of $1" >&2; exit 1; }
+        echo "$version"
+    }
+    binstall="$(latest cargo-binstall)"
+    tools=""
+    for tool in {{cargo_tools}}; do
+        name="${tool%@*}"
+        tools+="${tools:+ }$name@$(latest "$name")"
+    done
+    # perl rather than sed -i, which takes different arguments on macOS and Linux; the versions are
+    # passed through the environment so perl doesn't treat the `@` in `name@version` as an array
+    BINSTALL="$binstall" TOOLS="$tools" perl -pi -e 's/^binstall_version := ".*"/binstall_version := "$ENV{BINSTALL}"/; s/^cargo_tools := ".*"/cargo_tools := "$ENV{TOOLS}"/' "{{justfile()}}"
+    echo "binstall_version := \"$binstall\""
+    echo "cargo_tools := \"$tools\""
+    just install-tools
 
 # Build the project (pass extra flags, e.g. `just build --release`)
 build *args:
     cargo build {{args}}
 
-# Run tests (pass extra args, e.g. `just test greeting`)
+# Run tests with nextest, then doc tests, which nextest doesn't run (pass extra args, e.g. `just test greeting`)
 test *args:
-    cargo test {{args}}
+    cargo nextest run {{args}}
+    cargo test --doc
 
-# Format all code
+# Run tests with coverage and fail below `coverage_threshold`% line coverage (src/main.rs is excluded; doc tests aren't counted)
+coverage *args:
+    cargo llvm-cov nextest --fail-under-lines {{coverage_threshold}} --ignore-filename-regex 'src/main\.rs$' {{args}}
+
+# Format all Rust and TOML code
 fmt:
     cargo fmt --all
+    tombi format
 
-# Check formatting, run clippy with warnings as errors, and check GitHub Actions workflows
+# Check spelling and Rust and TOML formatting, run clippy and rustdoc with warnings as errors, check for unused dependencies, and check GitHub Actions workflows
 lint:
+    typos
     cargo fmt --all --check
+    tombi format --check
     cargo clippy --all-targets --all-features -- -D warnings
+    RUSTDOCFLAGS="-D warnings" cargo doc --no-deps --all-features
+    cargo shear --deny-warnings
     actionlint .github/workflows/*.yml
     zizmor .
+
+# Check the project builds with its minimum supported Rust version (`rust-version` in Cargo.toml)
+msrv:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    version="$(sed -n 's/^rust-version = "\(.*\)"$/\1/p' Cargo.toml)"
+    [[ -n "$version" ]] || { echo "rust-version not found in Cargo.toml" >&2; exit 1; }
+    rustup toolchain install "$version" --profile minimal
+    cargo "+$version" check --all-targets --all-features
+
+# Check dependencies for security advisories, licenses, banned crates and sources (pass a check, e.g. `just deny licenses`)
+deny *args:
+    cargo deny check {{args}}
 
 # Scan the Git history for committed secrets (pass extra flags, e.g. `just gitleaks --log-opts=-5`)
 gitleaks *args:

@@ -10,6 +10,9 @@ brew "just"
 # Project template tool; run `copier update` to pull in template changes
 brew "copier"
 
+# TOML formatter (run by `just lint`)
+brew "tombi"
+
 # GitHub Actions linters (run by `just lint`)
 brew "actionlint"
 brew "zizmor"
@@ -20,6 +23,8 @@ brew "prek"
 # Secret scanner (prek hook and `just gitleaks`)
 brew "gitleaks"
 
+# cargo-deny, cargo-nextest, cargo-shear, cargo-llvm-cov and typos are installed by `just setup`
+# with cargo-binstall (see `cargo_tools` in the justfile)
+
 # Dev tools
-# brew "bacon"          # background checker: re-runs clippy/tests on save
-# brew "cargo-nextest"  # faster test runner
+# brew "bacon"          # re-runs tests on save (see bacon.toml)

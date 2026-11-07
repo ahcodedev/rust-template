@@ -9,15 +9,19 @@ Rust project template for [Copier](https://copier.readthedocs.io/).
 
 ## Development
 
-- Install Copier, `just`, actionlint, zizmor, prek and gitleaks - `brew bundle`
+- Install `just` - `brew install just`
+- Install Copier, rustup, tombi, actionlint, zizmor, prek and gitleaks with Homebrew, then cargo-binstall and the pinned Rust tools (cargo-deny, cargo-nextest, cargo-shear, cargo-llvm-cov, typos) with cargo - `just setup`
+  - Change tool versions in `cargo_tools` at the top of the `justfile`; reinstall with `just install-tools`
+  - Bump them all to the latest releases and install them - `just update`
 - Enable the Git hooks in `prek.toml` - `prek install`
   - Before each commit they run `just lint` and scan the staged changes for secrets with gitleaks
 
 Commands are defined in the `justfile` and run with [just](https://github.com/casey/just).
 
 - List available commands - `just`
-- Check GitHub Actions workflows with actionlint and zizmor - `just lint`
-- Render the template into a temp directory, then lint and test the generated project - `just test-template`
+- Format TOML files with tombi - `just fmt`
+- Check spelling with typos, TOML formatting with tombi, and GitHub Actions workflows with actionlint and zizmor - `just lint`
+- Render the template into a temp directory, then lint, test, check coverage and check dependencies of the generated project - `just test-template`
 - Scan the Git history for committed secrets - `just gitleaks`
 
 CI runs `just lint` and `just test-template`, and scans the Git history for secrets with gitleaks.
