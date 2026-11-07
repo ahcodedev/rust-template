@@ -1,4 +1,7 @@
-# rust-template
+# Rust Template
+
+[![Template](https://github.com/ahcodedev/rust-template/actions/workflows/template.yml/badge.svg?branch=main)](https://github.com/ahcodedev/rust-template/actions/workflows/template.yml)
+[![gitleaks](https://img.shields.io/badge/protected%20by-gitleaks-blue)](https://github.com/gitleaks/gitleaks)
 
 Rust project template for [Copier](https://copier.readthedocs.io/).
 

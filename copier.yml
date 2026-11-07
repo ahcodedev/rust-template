@@ -27,6 +27,16 @@ description:
   help: Short description of the project
   default: ""
 
+github_owner:
+  type: str
+  help: GitHub user or organization that will host the repository (used for README badges)
+  default: ""
+
+github_repo:
+  type: str
+  help: GitHub repository name (used for README badges)
+  default: "{{ project_name }}"
+
 copyright_year:
   type: str
   help: Year used in the LICENSE copyright line
