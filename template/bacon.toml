@@ -1,0 +1,10 @@
+# bacon (https://dystroy.org/bacon/) re-runs a job each time you save. It's optional: install with
+# `brew install bacon`, then run `bacon` in a terminal. bacon's built-in jobs (check, clippy, doc, ...)
+# are still available, e.g. `bacon clippy-all`.
+
+# Re-run the tests with nextest, like `just test`
+default_job = "nextest"
+
+[keybindings]
+# Press `t` for nextest rather than bacon's default `cargo test` job
+t = "job:nextest"

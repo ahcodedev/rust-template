@@ -23,7 +23,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       # Installs the toolchain and components pinned in rust-toolchain.toml
       - name: Install Rust
@@ -33,12 +35,64 @@ jobs:
       #   uses: Swatinem/rust-cache@v2
 
       - name: Install just
-        uses: taiki-e/install-action@v2
+        uses: taiki-e/install-action@3a3daafd3b7f23b8f65d9f5ba2db203fb59b79e2 # v2
         with:
-          tool: just
+          tool: just,zizmor,uv,cargo-deny,cargo-nextest,cargo-shear,cargo-llvm-cov,typos,tombi
+
+      # actionlint isn't available from install-action; install it from PyPI with uv
+      - name: Install actionlint
+        run: |
+          uv tool install actionlint-py==1.7.12.25
+          uv tool dir --bin >> "$GITHUB_PATH"
 
       - name: Lint
         run: just lint
 
       - name: Test
         run: just test
+
+      - name: Coverage
+        run: just coverage
+
+      # Separate from Lint: a newly published advisory can fail this step without any code change
+      - name: Check dependencies
+        run: just deny
+
+  msrv:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Install just
+        uses: taiki-e/install-action@3a3daafd3b7f23b8f65d9f5ba2db203fb59b79e2 # v2
+        with:
+          tool: just
+
+      # Installs the toolchain set by rust-version in Cargo.toml and checks the project builds with it
+      - name: Check minimum supported Rust version
+        run: just msrv
+
+  gitleaks:
+    runs-on: ubuntu-latest
+    # Job-level permissions replace the workflow-level ones, so contents: read is repeated here.
+    # pull-requests: read lets the action list a PR's commits, which private repos require.
+    permissions:
+      contents: read
+      pull-requests: read
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          # Full history so every commit is scanned for secrets
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Scan for secrets
+        uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # PR comments would need the pull-requests: write permission
+          GITLEAKS_ENABLE_COMMENTS: false

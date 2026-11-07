@@ -1,0 +1,10 @@
+# Git hooks managed by prek (https://prek.j178.dev). Install with: prek install
+
+[[repos]]
+repo = "local"
+hooks = [
+  # Run the same checks as CI before each commit
+  { id = "just-lint", name = "just lint", entry = "just lint", language = "system", pass_filenames = false, always_run = true },
+  # Block commits that add secrets (scans only the staged changes)
+  { id = "gitleaks", name = "gitleaks", entry = "gitleaks git --pre-commit --staged --redact", language = "system", pass_filenames = false, always_run = true },
+]

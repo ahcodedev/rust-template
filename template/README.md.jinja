@@ -7,32 +7,71 @@
 ### macOS
 
 - Install `just` - `brew install just`
-- Install Homebrew dependencies and the Rust toolchain pinned in `rust-toolchain.toml` - `just setup`
+- Install Homebrew dependencies, the Rust toolchain pinned in `rust-toolchain.toml`, the Rust tools and the Git hooks - `just setup`
+  - The Rust tools (cargo-deny, cargo-nextest, cargo-shear, cargo-llvm-cov, typos) are installed as prebuilt binaries with [cargo-binstall](https://github.com/cargo-bins/cargo-binstall), which is installed with `cargo install` first if needed
+  - Their versions are pinned in `cargo_tools` at the top of the `justfile`; reinstall with `just install-tools`
+  - `just setup` is built to run in an established Git repository (it fails otherwise); run `git init` first if needed
 - Verify the setup - `just test`
 
-Homebrew's `rustup` is keg-only, so `cargo` and `rustc` aren't on your shell PATH. The `justfile` adds them for every recipe, so use `just` commands rather than calling `cargo` directly. To use `cargo` in your shell, add this to `~/.zshrc`:
+Homebrew's `rustup` is keg-only, so `cargo` and `rustc` aren't on your shell PATH, and neither are the tools in `~/.cargo/bin`. The `justfile` adds both for every recipe, so use `just` commands rather than calling `cargo` directly. To use them in your shell, add this to `~/.zshrc`:
 
 ```sh
-export PATH="$(brew --prefix rustup)/bin:$PATH"
+export PATH="$HOME/.cargo/bin:$(brew --prefix rustup)/bin:$PATH"
 ```
 
 ### Dev Container
 
 - Open the repo in VS Code and run **Dev Containers: Reopen in Container**
-  - Rust, `just`, and the recommended extensions are installed automatically
+  - Rust, `just`, cargo-deny, cargo-nextest, cargo-shear, cargo-llvm-cov, typos, tombi, actionlint, zizmor, prek, gitleaks and the recommended extensions are installed automatically
+  - The Git hooks are installed if the workspace is a Git repository
 
 ## Project Commands
 
 Commands are defined in the `justfile` and run with [just](https://github.com/casey/just).
 
 - List available commands - `just`
-- Install Homebrew dependencies and the pinned toolchain - `just setup`
+- Install Homebrew dependencies, the pinned toolchain, the Rust tools and the Git hooks - `just setup`
+- Install or update the pinned Rust tools (`cargo_tools` in the `justfile`) - `just install-tools`
+- Bump the pinned Rust tools to their latest releases in the `justfile`, then install them - `just update`
 - Build the project - `just build`
   - Pass extra flags - `just build --release`
-- Run tests - `just test`
+- Run tests with [nextest](https://nexte.st), then doc tests - `just test`
   - Pass extra args - `just test greeting`
-- Format all code - `just fmt`
-- Check formatting and run clippy with warnings as errors - `just lint`
+- Run tests with coverage; fails below 98% line coverage - `just coverage`
+  - Change the minimum in `coverage_threshold` at the top of the `justfile`, or once with `just coverage_threshold=90 coverage`
+  - `src/main.rs` is excluded, and doc tests aren't counted
+- Format all Rust and TOML code (rustfmt and tombi) - `just fmt`
+- Check spelling with typos and Rust and TOML formatting, run clippy and rustdoc with warnings as errors, check for unused dependencies with cargo-shear, and check GitHub Actions workflows with actionlint and zizmor - `just lint`
+- Check the project builds with its minimum supported Rust version (`rust-version` in `Cargo.toml`) - `just msrv`
+- Check dependencies for security advisories, licenses, banned crates and sources (`deny.toml`) - `just deny`
+  - Run a single check - `just deny licenses`
+- Scan the Git history for committed secrets - `just gitleaks`
+
+Optional: re-run the tests each time you save with [bacon](https://dystroy.org/bacon/) (`bacon.toml`).
+
+- Install - `brew install bacon`
+- Run in a terminal - `bacon`
+  - Press `c` for clippy, `d` for docs or `t` to go back to tests
+- bacon calls `cargo` directly, so on macOS add Homebrew's `rustup` to your PATH first (see Setup)
+
+## Checks
+
+- Git hooks, managed by [prek](https://github.com/j178/prek) (`prek.toml`), run before each commit
+  - `just lint`
+  - [gitleaks](https://github.com/gitleaks/gitleaks) on the staged changes
+  - Install them manually with `prek install`
+- CI runs `just lint`, `just test`, `just coverage`, `just deny` and `just msrv`, and scans the Git history for secrets with gitleaks
+  - Repos owned by a GitHub organization need a `GITLEAKS_LICENSE` secret for the gitleaks job; personal repos don't
+  - Dependabot PRs only get Dependabot secrets, so organization repos also need `GITLEAKS_LICENSE` added as a Dependabot secret
+
+## Dependency Updates
+
+- Dependabot (`.github/dependabot.yml`) opens weekly PRs for Cargo dependencies and GitHub Actions
+  - Updates wait 7 days after a release before a PR is opened
+- Patch and minor updates are auto-merged once CI passes (`.github/workflows/dependabot-auto-merge.yml`); major updates wait for review
+  - Auto-merge needs "Allow auto-merge" turned on in the repository settings and a branch protection rule or ruleset on `main` that requires the CI checks
+  - On GitHub Free, branch protection and auto-merge are only available for public repos
+- Dependabot doesn't update the actionlint version in the workflows and dev container, or the gitleaks version and image in the dev container
 
 ## Template
 

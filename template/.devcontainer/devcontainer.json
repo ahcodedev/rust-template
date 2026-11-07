@@ -8,8 +8,11 @@
 	"capAdd": ["SYS_PTRACE"],
 	"securityOpt": ["seccomp=unconfined"],
 
-	// Install the toolchain pinned in rust-toolchain.toml and the `just` command runner
-	"postCreateCommand": "rustup toolchain install && sudo apt-get update && sudo apt-get install -y --no-install-recommends just",
+	// Install the toolchain pinned in rust-toolchain.toml, the `just` command runner, the zizmor workflow linter, the Rust tools in the justfile's
+	// `cargo_tools` (cargo-deny, cargo-nextest, cargo-shear, cargo-llvm-cov, typos) with cargo-binstall via `just install-tools`,
+	// uv, actionlint and the tombi TOML formatter (from PyPI, since Debian doesn't package them), the prek Git hook manager and the gitleaks secret scanner (a checksum-verified GitHub
+	// release, since Debian's package is too old), then install the hooks if the workspace is a Git repository
+	"postCreateCommand": "rustup toolchain install && sudo apt-get update && sudo apt-get install -y --no-install-recommends just && cargo install --locked zizmor prek uv && just install-tools && uv tool install actionlint-py==1.7.12.25 && uv tool install tombi && uv tool update-shell && v=8.30.1 && a=$(dpkg --print-architecture | sed s/amd64/x64/) && cd /tmp && curl -fsSLO https://github.com/gitleaks/gitleaks/releases/download/v$v/gitleaks_${v}_linux_$a.tar.gz && curl -fsSL https://github.com/gitleaks/gitleaks/releases/download/v$v/gitleaks_${v}_checksums.txt | sha256sum --check --ignore-missing && sudo tar -xzf gitleaks_${v}_linux_$a.tar.gz -C /usr/local/bin gitleaks && rm gitleaks_${v}_linux_$a.tar.gz && cd - && if [ -e .git ]; then prek install; fi",
 
 	"customizations": {
 		"vscode": {
