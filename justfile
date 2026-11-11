@@ -67,7 +67,6 @@ test-template:
     # -r HEAD renders the current checkout, including uncommitted changes
     copier copy --defaults -r HEAD \
         -d project_name=test-project \
-        -d author_name=Test \
         -d copyright_year={{ datetime("%Y") }} \
         "{{ justfile_directory() }}" "$tmp/test-project"
     cd "$tmp/test-project"
