@@ -52,6 +52,24 @@ jobs:
       - name: Generate and test project
         run: just test-template
 
+  zizmor:
+    runs-on: ubuntu-latest
+    # Uploads findings to the repository's code scanning alerts instead of failing the job.
+    # contents and actions: read are only needed for private repos.
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      # Also runs zizmor's online audits (e.g. known-vulnerable actions), which `just lint` skips
+      - name: Audit workflows
+        uses: zizmorcore/zizmor-action@45d7276c9ca790aabd705e31ca99c6185c3e76dd # v0.8.1
+
   gitleaks:
     runs-on: ubuntu-latest
     # Job-level permissions replace the workflow-level ones, so contents: read is repeated here.

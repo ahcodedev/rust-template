@@ -6,6 +6,7 @@
 [![just](https://img.shields.io/badge/built%20with-just-blue)](https://github.com/casey/just)
 [![prek](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/j178/prek/master/docs/assets/badge-v0.json)](https://github.com/j178/prek)
 [![Dependabot](https://img.shields.io/badge/Dependabot-enabled-blue?logo=dependabot)](https://docs.github.com/code-security/dependabot)
+[![zizmor](https://img.shields.io/badge/%F0%9F%8C%88-zizmor-white?labelColor=white)](https://zizmor.sh/)
 
 Rust project template for [Copier](https://copier.readthedocs.io/).
 
@@ -31,7 +32,10 @@ Commands are defined in the `justfile` and run with [just](https://github.com/ca
 - Render the template into a temp directory, then lint, test, check coverage and check dependencies of the generated project - `just test-template`
 - Scan the Git history for committed secrets - `just gitleaks`
 
-CI runs `just lint` and `just test-template`, and scans the Git history for secrets with gitleaks.
+CI runs `just lint` and `just test-template`, scans the Git history for secrets with gitleaks, and audits the workflows with [zizmor-action](https://github.com/zizmorcore/zizmor-action).
+
+- zizmor-action reports findings as code scanning alerts in the repository's Security tab rather than failing CI
+  - Code scanning needs a public repo, or GitHub Advanced Security on a private one
 
 ## Dependency Updates
 

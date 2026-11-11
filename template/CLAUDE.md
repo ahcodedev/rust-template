@@ -18,7 +18,7 @@ Run project tasks through `just` (see `justfile`) rather than calling `cargo` di
 - `just deny` - check dependencies for security advisories, licenses, banned crates and sources (`deny.toml`)
 - `just gitleaks` - scan the Git history for committed secrets
 
-Run `just fmt` and `just lint` after making changes; CI runs `just lint`, `just test`, `just coverage`, `just deny` and `just msrv` and fails on any warning, and scans the Git history for secrets with gitleaks.
+Run `just fmt` and `just lint` after making changes; CI runs `just lint`, `just test`, `just coverage`, `just deny` and `just msrv` and fails on any warning, scans the Git history for secrets with gitleaks, and audits the workflows with zizmor-action, which reports findings as code scanning alerts.
 
 ## Git hooks
 
