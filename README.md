@@ -2,12 +2,16 @@
 
 [![Template](https://github.com/ahcodedev/rust-template/actions/workflows/template.yml/badge.svg?branch=main)](https://github.com/ahcodedev/rust-template/actions/workflows/template.yml)
 [![gitleaks](https://img.shields.io/badge/protected%20by-gitleaks-blue)](https://github.com/gitleaks/gitleaks)
+[![Copier](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/copier-org/copier/master/img/badge/badge-grayscale-inverted-border-orange.json)](https://github.com/copier-org/copier)
+[![just](https://img.shields.io/badge/built%20with-just-blue)](https://github.com/casey/just)
+[![prek](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/j178/prek/master/docs/assets/badge-v0.json)](https://github.com/j178/prek)
+[![Dependabot](https://img.shields.io/badge/Dependabot-enabled-blue?logo=dependabot)](https://docs.github.com/code-security/dependabot)
 
 Rust project template for [Copier](https://copier.readthedocs.io/).
 
 ## Usage
 
-- Create a new project - `copier copy gh:<owner>/rust-template path/to/new-project`
+- Create a new project - `copier copy gh:ahcodedev/rust-template path/to/new-project`
 - Pull in template updates from inside a generated project - `just update-template` (runs `copier update`)
 
 ## Development
