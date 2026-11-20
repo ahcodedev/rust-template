@@ -14,6 +14,7 @@ Rust project template for [Copier](https://copier.readthedocs.io/).
 
 - Create a new project - `copier copy gh:ahcodedev/rust-template path/to/new-project`
 - Pull in template updates from inside a generated project - `just update-template` (runs `copier update`)
+- New projects and updates use the latest template release (`vX.Y.Z` tag); changes merged to `main` reach projects only after a release
 
 ## Development
 
@@ -37,6 +38,26 @@ CI runs `just lint` and `just test-template`, scans the Git history for secrets 
 - zizmor-action reports findings as code scanning alerts in the repository's Security tab rather than failing CI
   - Code scanning needs a public repo, or GitHub Advanced Security on a private one
 
+## Releases
+
+Releases are managed with [Release Drafter](https://github.com/release-drafter/release-drafter), which reads the
+**release labels** on merged pull requests. Commit messages and PR titles aren't parsed.
+
+| Release label                                              | Version bump | Release notes section |
+| ---------------------------------------------------------- | ------------ | --------------------- |
+| `breaking`                                                 | major        | Breaking Changes      |
+| `feature`, `enhancement`                                   | minor        | Features              |
+| `bug`, `fix`                                               | patch        | Bug Fixes             |
+| `chore`, `ci`, `dependencies`, `documentation`, `refactor` | patch        | Maintenance           |
+| `skip-changelog`                                           | none         | Excluded              |
+
+- Every PR needs at least one release label, or the `Release Drafter / require-label` check fails
+  - Labels are added automatically from the branch name prefix (`feat/`, `fix/`, `chore/`, `ci/`, `docs/`,
+    `refactor/`, `dependabot/`) and from the files a PR changes
+- Merging to `main` updates a draft GitHub Release with the next version and notes
+- To release, run the **Release** workflow from the Actions tab. It publishes the draft and tags the commit `vX.Y.Z`,
+  which Copier uses as the template version
+
 ## Dependency Updates
 
 - Dependabot (`.github/dependabot.yml`) opens weekly PRs for GitHub Actions in this repo's workflows and in `template/`
@@ -52,3 +73,4 @@ CI runs `just lint` and `just test-template`, scans the Git history for secrets 
 - `template/` - files rendered into new projects; files ending in `.jinja` are templated
 - `prek.toml` - Git hooks for this repo
 - `.github/pull_request_template.md` - checklist filled into new PR descriptions
+- `.github/release-drafter.yml` - release label to version bump and release notes section mapping
